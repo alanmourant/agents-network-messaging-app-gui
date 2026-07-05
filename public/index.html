@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stage Mesh | Local Crew Comms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow bg-glow-a"></div>
+    <div class="bg-glow bg-glow-b"></div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <p class="eyebrow">LOCAL DIRECT MESSAGING</p>
+          <h1>Stage Mesh</h1>
+          <p class="subtitle">Point-to-point device messaging on this network</p>
+        </div>
+
+        <section>
+          <h2>Recipients</h2>
+          <div id="recipientList" class="channel-list"></div>
+        </section>
+
+        <section>
+          <h2>Online Users</h2>
+          <div id="onlineUserList" class="online-user-list"></div>
+        </section>
+
+        <section>
+          <h2>Your Handle</h2>
+          <label>
+            Display Name
+            <input id="handleInput" type="text" maxlength="40" placeholder="Leave blank for auto name" />
+          </label>
+          <div class="handle-controls">
+            <button id="saveHandleBtn" type="button" class="ghost-btn">Save Handle</button>
+            <button id="resetHandleBtn" type="button" class="ghost-btn">Use Default</button>
+          </div>
+          <p id="myIdentity" class="subtitle"></p>
+        </section>
+
+        <section>
+          <h2>Cue Shortcuts</h2>
+          <div class="quick-actions" id="quickActions">
+            <button data-cue="Standby" type="button">Standby</button>
+            <button data-cue="Go" type="button">Go</button>
+            <button data-cue="Hold" type="button">Hold</button>
+            <button data-cue="Clear" type="button">Clear</button>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">ACTIVE RECIPIENT</p>
+            <h2 id="activeRecipientTitle">Select a recipient</h2>
+          </div>
+
+          <div class="status-strip">
+            <span id="connState" class="pill offline">offline</span>
+            <span id="onlineCount" class="pill">0 online</span>
+            <span id="tabStatus" class="pill warning hidden">Multiple tabs</span>
+          </div>
+        </header>
+
+        <section id="alertBanner" class="alert-banner hidden"></section>
+
+        <section id="messages" class="messages" aria-live="polite"></section>
+
+        <section class="receive-window">
+          <div class="receive-window-head">Received Messages</div>
+          <section id="receivedMessages" class="received-messages" aria-live="polite"></section>
+        </section>
+
+        <section id="composerPanel" class="composer">
+          <form id="messageForm">
+            <div class="composer-top-row">
+              <label>
+                Priority
+                <select id="prioritySelect">
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </label>
+
+              <label class="toggle-wrap">
+                <input id="alwaysListeningToggle" type="checkbox" />
+                <span>Always listening</span>
+              </label>
+            </div>
+
+            <textarea
+              id="messageInput"
+              rows="3"
+              maxlength="1200"
+              placeholder="Type an update... or use speech"
+              required
+            ></textarea>
+
+            <div class="composer-actions">
+              <button id="pttBtn" type="button" class="ghost-btn">Hold To Speak</button>
+              <button id="sendBtn" type="submit" class="send-btn">Send</button>
+            </div>
+
+            <p id="recipientStatus" class="publish-status">Choose a recipient to begin messaging.</p>
+            <p id="speechStatus" class="speech-status">Speech idle.</p>
+            <p id="queueStatus" class="queue-status">Outbox idle.</p>
+            <div id="outboxList" class="outbox-list"></div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
