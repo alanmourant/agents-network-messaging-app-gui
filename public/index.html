@@ -2,124 +2,144 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stage Mesh | Local Crew Comms</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>LAN Device Finder</title>
+    <meta name="theme-color" content="#10130f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="LAN Device Finder" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="bg-glow bg-glow-a"></div>
-    <div class="bg-glow bg-glow-b"></div>
+    <div class="bg-shape bg-a"></div>
+    <div class="bg-shape bg-b"></div>
 
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <p class="eyebrow">LOCAL DIRECT MESSAGING</p>
-          <h1>Stage Mesh</h1>
-          <p class="subtitle">Point-to-point device messaging on this network</p>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">LOCAL NETWORK TOOL</p>
+        <h1>LAN Device Finder</h1>
+        <p class="sub">Scan your local subnet and list devices by IP, MAC address, and hostname. You must have this device on the same network to see the hosts.</p>
+      </header>
+
+      <section class="controls card">
+        <div class="field-group">
+          <label for="interfaceSelect">Interface</label>
+          <select id="interfaceSelect"></select>
         </div>
 
-        <section>
-          <h2>Recipients</h2>
-          <div id="recipientList" class="channel-list"></div>
-        </section>
+        <div class="field-group">
+          <label for="cidrSelect">CIDR Range</label>
+          <select id="cidrSelect"></select>
+        </div>
 
-        <section>
-          <h2>Online Users</h2>
-          <div id="onlineUserList" class="online-user-list"></div>
-        </section>
+        <div class="field-group">
+          <label for="timeoutInput">Ping timeout (ms)</label>
+          <input id="timeoutInput" type="number" min="80" max="600" step="10" value="120" />
+        </div>
 
-        <section>
-          <h2>Your Handle</h2>
-          <label>
-            Display Name
-            <input id="handleInput" type="text" maxlength="40" placeholder="Leave blank for auto name" />
-          </label>
-          <div class="handle-controls">
-            <button id="saveHandleBtn" type="button" class="ghost-btn">Save Handle</button>
-            <button id="resetHandleBtn" type="button" class="ghost-btn">Use Default</button>
-          </div>
-          <p id="myIdentity" class="subtitle"></p>
-        </section>
+        <div class="field-group">
+          <label for="concurrencyInput">Parallel probes</label>
+          <input id="concurrencyInput" type="number" min="16" max="256" step="1" value="128" />
+        </div>
 
-        <section>
-          <h2>Cue Shortcuts</h2>
-          <div class="quick-actions" id="quickActions">
-            <button data-cue="Standby" type="button">Standby</button>
-            <button data-cue="Go" type="button">Go</button>
-            <button data-cue="Hold" type="button">Hold</button>
-            <button data-cue="Clear" type="button">Clear</button>
-          </div>
-        </section>
-      </aside>
+        <div class="field-group">
+          <label for="resolveHostnamesToggle">Hostname lookup</label>
+          <select id="resolveHostnamesToggle">
+            <option value="off" selected>Off (faster)</option>
+            <option value="on">On (slower)</option>
+          </select>
+        </div>
 
-      <main class="main-panel">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">ACTIVE RECIPIENT</p>
-            <h2 id="activeRecipientTitle">Select a recipient</h2>
-          </div>
+        <button id="scanBtn" class="scan-btn" type="button">Scan Network</button>
+      </section>
 
-          <div class="status-strip">
-            <span id="connState" class="pill offline">offline</span>
-            <span id="onlineCount" class="pill">0 online</span>
-            <span id="tabStatus" class="pill warning hidden">Multiple tabs</span>
-          </div>
-        </header>
+      <section class="summary-grid">
+        <article class="card summary-card">
+          <h2>Scanned Hosts</h2>
+          <p id="scannedHostCount" class="metric">0</p>
+        </article>
+        <article class="card summary-card">
+          <h2>Online</h2>
+          <p id="onlineCount" class="metric">0</p>
+        </article>
+        <article class="card summary-card">
+          <h2>Seen In ARP</h2>
+          <p id="seenCount" class="metric">0</p>
+        </article>
+        <article class="card summary-card">
+          <h2>Scan Time</h2>
+          <p id="duration" class="metric">0 ms</p>
+        </article>
+      </section>
 
-        <section id="alertBanner" class="alert-banner hidden"></section>
+      <section class="card status-card">
+        <p id="statusText">Ready to scan.</p>
+      </section>
 
-        <section id="messages" class="messages" aria-live="polite"></section>
+      <section class="actions-row">
+        <button id="resetScanBtn" class="reset-btn" type="button">Reset</button>
+        <button id="exportCsvBtn" class="export-btn" type="button" disabled>Export Results to CSV</button>
+      </section>
 
-        <section class="receive-window">
-          <div class="receive-window-head">Received Messages</div>
-          <section id="receivedMessages" class="received-messages" aria-live="polite"></section>
-        </section>
+      <section class="card table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>Hostname</th>
+                <th>Discovery Source</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <tr>
+                <td colspan="5" class="placeholder">No scan data yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        <section id="composerPanel" class="composer">
-          <form id="messageForm">
-            <div class="composer-top-row">
-              <label>
-                Priority
-                <select id="prioritySelect">
-                  <option value="normal">Normal</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
-                </select>
-              </label>
-
-              <label class="toggle-wrap">
-                <input id="alwaysListeningToggle" type="checkbox" />
-                <span>Always listening</span>
-              </label>
-            </div>
-
-            <textarea
-              id="messageInput"
-              rows="3"
-              maxlength="1200"
-              placeholder="Type an update... or use speech"
-              required
-            ></textarea>
-
-            <div class="composer-actions">
-              <button id="pttBtn" type="button" class="ghost-btn">Hold To Speak</button>
-              <button id="sendBtn" type="submit" class="send-btn">Send</button>
-            </div>
-
-            <p id="recipientStatus" class="publish-status">Choose a recipient to begin messaging.</p>
-            <p id="speechStatus" class="speech-status">Speech idle.</p>
-            <p id="queueStatus" class="queue-status">Outbox idle.</p>
-            <div id="outboxList" class="outbox-list"></div>
-          </form>
-        </section>
-      </main>
-    </div>
+      <footer class="app-footer">
+        <span id="appBuildInfo">Loading app info...</span>
+        <div class="scheme-picker">
+          <label for="themeSelect">Color Scheme</label>
+          <select id="themeSelect" class="scheme-select">
+            <option value="earth" selected>Earth</option>
+            <option value="forest">Forest</option>
+            <option value="sandstone">Sandstone</option>
+            <option value="night-contrast">Night Contrast</option>
+          </select>
+        </div>
+        <span id="electronShortcut" class="app-shortcut">Electron shortcut on your Desktop</span>
+        <button
+          id="homeScreenTipBtn"
+          class="home-screen-tip"
+          type="button"
+          aria-label="IPAD: Safari- tap Share (square with up arrow), then Add to Home Screen"
+          title="IPAD: Safari- tap Share (square with up arrow), then Add to Home Screen"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3l4 4h-3v6h-2V7H8l4-4z" fill="currentColor"/>
+            <path d="M5 10v9c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-9h-2v9H7v-9H5z" fill="currentColor"/>
+          </svg>
+          <span class="home-screen-tip-text">IPAD: Safari- tap Share (square with up arrow), then Add to Home Screen</span>
+          <span class="sr-only">IPAD: Safari- tap Share (square with up arrow), then Add to Home Screen</span>
+        </button>
+        <button id="updateBadge" class="update-badge" type="button">Checking updates...</button>
+        <span class="footer-credit">Developed by Alan Mourant. Sounds Technical. &copy;</span>
+      </footer>
+    </main>
 
     <script src="/app.js" defer></script>
   </body>

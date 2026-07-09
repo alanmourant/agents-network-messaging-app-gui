@@ -1,0 +1,17 @@
+{
+  "name": "LAN Device Finder",
+  "short_name": "LAN Finder",
+  "description": "Scan your local network and list discovered devices.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#10130f",
+  "theme_color": "#10130f",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

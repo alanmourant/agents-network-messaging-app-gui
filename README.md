@@ -1,19 +1,19 @@
-# Stage Mesh (LAN Crew Messaging)
+# LAN Device Finder
 
-Stage Mesh is a local-network point-to-point messaging app.
+LAN Device Finder is a web app that scans your local network and lists discovered devices.
 
-## Features in this baseline
+## Features
 
-- Multi-device messaging over the same LAN
-- Direct one-to-one messaging between devices
-- Priority message levels (normal, high, critical)
-- Delivery acknowledgment tracking (per-message delivered count)
-- Offline outbox queue with automatic resend on reconnect
-- Presence list of online devices
-- Conversation history for the selected recipient
-- Speech-to-text modes:
-  - Hold-to-speak dictation
-  - Always-listening mode with visible state
+- Detects active IPv4 interfaces on the host machine
+- Scans hosts on a selected interface subnet (or custom CIDR)
+- Uses ping sweep plus ARP table lookup for device discovery
+- Displays discovered IP address, MAC address, hostname, and source
+- Responsive frontend built with HTML, CSS, and JavaScript
+
+## Requirements
+
+- Node.js 18+
+- Local network access permissions for ping and arp commands
 
 ## Run
 
@@ -21,39 +21,53 @@ Stage Mesh is a local-network point-to-point messaging app.
 
    npm install
 
-2. Start the server:
+2. Start the browser app:
 
    npm start
 
-3. Open on host machine:
+3. Open in a browser:
 
-   http://localhost:8080
+   http://localhost:3000
 
-4. Open on other devices in same network:
+## Desktop app
 
-   http://<host-lan-ip>:8080
+Launch the Electron desktop version with:
 
-The app now auto-joins each device immediately with no login prompt.
+  npm run electron
 
-## Browser speech support
+This opens the same app in a standalone window and starts the local server automatically.
 
-Speech-to-text relies on browser speech recognition support (commonly available in Chromium-based browsers). The UI falls back to typing when not supported.
+The desktop build also includes GitHub-based update checks. Use the app menu or tray menu to select "Check for Updates" in a packaged build.
 
-## Current protocol events
+## Build a Windows .exe
 
-Client to server:
-- join
-- get_history
-- send_message
-- ack
+Create a portable Windows executable with:
 
-Server to client:
-- server_hello
-- joined
-- history
-- message
-- message_accepted
-- message_delivery
-- alert
-- presence
-- error
+   npm run build:win
+
+The output is written to the dist folder.
+
+Create a Windows installer with:
+
+   npm run build:installer
+
+The installer is also written to the dist folder.
+
+## API endpoints
+
+- GET /api/health
+- GET /api/interfaces
+- POST /api/scan
+
+POST /api/scan accepts:
+
+- interfaceId (string, optional)
+- cidr (string, optional, for example 192.168.1.0/24)
+- timeoutMs (number, optional)
+- concurrency (number, optional)
+
+Notes:
+
+- CIDR scans support prefixes from /1 through /30.
+- Requests are always accepted for valid CIDR ranges; large ranges are truncated.
+- Maximum hosts scanned per request is capped to 1024.

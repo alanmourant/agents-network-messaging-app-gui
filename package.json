@@ -1,17 +1,69 @@
 {
   "name": "lan-stage-messenger",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Local network messaging app for theatre and concert crews with speech-to-text",
-  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alanmourant/lan-devices.git"
+  },
+  "main": "electron-main.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check server.js"
+    "electron": "electron .",
+    "electron:dev": "electron .",
+    "build:win": "electron-builder --win portable",
+    "build:installer": "electron-builder --win nsis",
+    "dist:win": "electron-builder --win portable",
+    "check": "node --check server.js && node --check electron-main.js && node --check preload.js"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "express": "^4.19.2",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^43.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.lan.devicefinder",
+    "productName": "LAN Device Finder",
+    "icon": "build/icon.ico",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "server.js",
+      "electron-main.js",
+      "preload.js",
+      "public/**",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "portable": {
+      "artifactName": "LAN Device Finder Setup ${version}.exe"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "alanmourant",
+        "repo": "lan-devices"
+      }
+    ]
   }
 }
