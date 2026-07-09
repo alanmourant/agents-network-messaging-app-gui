@@ -30,10 +30,7 @@ jobs:
         run: npm run check
 
       - name: Build portable Windows app
-        run: npm run build:win
-
-      - name: Upload release asset
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/LAN Device Finder Setup *.exe
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --win portable --publish always
