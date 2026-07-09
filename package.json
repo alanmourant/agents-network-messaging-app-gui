@@ -5,7 +5,7 @@
   "description": "Local network messaging app for theatre and concert crews with speech-to-text",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alanmourant/lan-devices.git"
+    "url": "https://github.com/alanmourant/agents-network-messaging-app-gui.git"
   },
   "main": "electron-main.js",
   "type": "commonjs",
@@ -62,7 +62,7 @@
       {
         "provider": "github",
         "owner": "alanmourant",
-        "repo": "lan-devices"
+        "repo": "agents-network-messaging-app-gui"
       }
     ]
   }
