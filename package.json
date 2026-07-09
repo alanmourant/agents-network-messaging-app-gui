@@ -1,6 +1,6 @@
 {
   "name": "lan-stage-messenger",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "Local network messaging app for theatre and concert crews with speech-to-text",
   "repository": {
