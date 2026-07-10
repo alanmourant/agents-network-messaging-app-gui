@@ -29,6 +29,32 @@ LAN Device Finder is a web app that scans your local network and lists discovere
 
    http://localhost:3000
 
+## Optional SSL (HTTPS)
+
+You can run the server with TLS certificates so the app serves over HTTPS.
+
+1. Set environment variables to your certificate files:
+
+   - SSL_KEY_PATH
+   - SSL_CERT_PATH
+   - SSL_CA_PATH (optional)
+
+2. Start the app as normal:
+
+   npm start
+
+   or use the HTTPS helper command (defaults to local cert files):
+
+   npm run start:https
+
+   Default certificate paths used by `start:https`:
+
+   - certs/localhost-key.pem
+   - certs/localhost-cert.pem
+
+If certificates are valid, the app runs on https://localhost:3000 (or your chosen PORT).
+If certs are missing or invalid, the app automatically falls back to HTTP.
+
 ## Desktop app
 
 Launch the Electron desktop version with:

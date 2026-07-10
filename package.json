@@ -11,6 +11,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
+    "start:https": "node -e \"process.env.SSL_KEY_PATH=process.env.SSL_KEY_PATH||'certs/localhost-key.pem';process.env.SSL_CERT_PATH=process.env.SSL_CERT_PATH||'certs/localhost-cert.pem';require('./server').startServer().catch((error)=>{console.error(error);process.exit(1);});\"",
     "dev": "node server.js",
     "electron": "electron .",
     "electron:dev": "electron .",

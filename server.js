@@ -1,13 +1,16 @@
 const path = require("path");
 const os = require("os");
 const http = require("http");
+const https = require("https");
+const fs = require("fs");
 const dns = require("dns").promises;
 const express = require("express");
 const { execFile } = require("child_process");
 const packageJson = require("./package.json");
 
 const app = express();
-const server = http.createServer(app);
+const serverConfig = createServerConfig();
+const server = serverConfig.server;
 let listeningPromise = null;
 
 const PORT = process.env.PORT || 3000;
@@ -18,6 +21,50 @@ const MAX_TIMEOUT_MS = 600;
 const SCAN_BATCH_SIZE = 256;
 const MAX_SCAN_HOSTS = 1024;
 const MAX_SCAN_DURATION_MS = 10000;
+
+function createTlsOptions() {
+  const keyPath = process.env.SSL_KEY_PATH;
+  const certPath = process.env.SSL_CERT_PATH;
+  const caPath = process.env.SSL_CA_PATH;
+
+  if (!keyPath || !certPath) {
+    return null;
+  }
+
+  try {
+    const options = {
+      key: fs.readFileSync(path.resolve(keyPath)),
+      cert: fs.readFileSync(path.resolve(certPath))
+    };
+
+    if (caPath) {
+      options.ca = fs.readFileSync(path.resolve(caPath));
+    }
+
+    return options;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    console.warn(`[server] HTTPS disabled. Could not load TLS certificate files: ${detail}`);
+    return null;
+  }
+}
+
+function createServerConfig() {
+  const tlsOptions = createTlsOptions();
+  if (tlsOptions) {
+    return {
+      protocol: "https",
+      secure: true,
+      server: https.createServer(tlsOptions, app)
+    };
+  }
+
+  return {
+    protocol: "http",
+    secure: false,
+    server: http.createServer(app)
+  };
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -276,6 +323,8 @@ app.get("/api/health", (_req, res) => {
     ok: true,
     ts: nowIso(),
     platform: process.platform,
+    protocol: serverConfig.protocol,
+    secure: serverConfig.secure,
     name: packageJson.name,
     version: packageJson.version,
     productName: packageJson.build?.productName || "LAN Device Finder"
@@ -439,8 +488,15 @@ function startServer(port = PORT) {
       server.off("error", onError);
       const address = server.address();
       const actualPort = typeof address === "object" && address ? address.port : port;
-      console.log(`[server] LAN scanner available at http://localhost:${actualPort}`);
-      resolve({ server, port: actualPort });
+      const baseUrl = `${serverConfig.protocol}://localhost:${actualPort}`;
+      console.log(`[server] LAN scanner available at ${baseUrl}`);
+      resolve({
+        server,
+        port: actualPort,
+        protocol: serverConfig.protocol,
+        secure: serverConfig.secure,
+        baseUrl
+      });
     };
 
     server.once("error", onError);

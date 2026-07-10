@@ -197,7 +197,7 @@ function refreshMenus() {
 async function createWindow() {
   const started = await startServer(0);
   serverInstance = started.server;
-  const { port } = started;
+  const { port, protocol = "http" } = started;
   const appName = app.getName();
   const appVersion = app.getVersion();
   const shouldStartHidden = Boolean(appSettings.startHidden);
@@ -218,7 +218,7 @@ async function createWindow() {
     }
   });
 
-  await mainWindow.loadURL(`http://127.0.0.1:${port}`);
+  await mainWindow.loadURL(`${protocol}://127.0.0.1:${port}`);
 
   if (!shouldStartHidden) {
     mainWindow.show();
