@@ -79,22 +79,9 @@ Create a Windows installer with:
 
 The installer is also written to the dist folder.
 
-## macOS DMG signing and notarization
+## Release pipeline
 
-The GitHub release workflow can build and upload a macOS DMG.
-To prevent the "app is damaged" Gatekeeper warning, configure these repository secrets:
-
-- MACOS_CERT_P12_BASE64
-- MACOS_CERT_PASSWORD
-- APPLE_ID
-- APPLE_APP_SPECIFIC_PASSWORD
-- APPLE_TEAM_ID
-
-Notes:
-
-- `MACOS_CERT_P12_BASE64` should be your Developer ID Application `.p12` content encoded in base64.
-- `APPLE_APP_SPECIFIC_PASSWORD` is generated from your Apple ID account security settings.
-- The macOS release job now fails fast when these secrets are missing.
+The GitHub release workflow currently builds and uploads the Windows `.exe` only.
 
 ## API endpoints
 
