@@ -32,7 +32,6 @@
   "build": {
     "appId": "com.lan.devicefinder",
     "productName": "LAN Device Finder",
-    "icon": "build/icon.ico",
     "directories": {
       "output": "dist"
     },
@@ -45,9 +44,15 @@
     ],
     "asar": true,
     "win": {
+      "icon": "build/icon.ico",
       "target": [
         "portable",
         "nsis"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg"
       ]
     },
     "nsis": {
