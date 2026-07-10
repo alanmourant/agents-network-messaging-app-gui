@@ -57,3 +57,46 @@ jobs:
           files: ${{ steps.asset.outputs.path }}
           fail_on_unmatched_files: true
           generate_release_notes: true
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build macOS DMG
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder --mac dmg --publish never
+
+      - name: Resolve DMG asset
+        id: dmg
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset="$(ls -t dist/*.dmg 2>/dev/null | head -n1 || true)"
+
+          if [ -z "$asset" ]; then
+            echo "macOS DMG not found in dist."
+            exit 1
+          fi
+
+          echo "path=$asset" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: ${{ steps.dmg.outputs.path }}
+          fail_on_unmatched_files: true
