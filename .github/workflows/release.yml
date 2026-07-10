@@ -60,6 +60,12 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    env:
+      CSC_LINK: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+      CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
     steps:
       - name: Check out repository
@@ -73,6 +79,23 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Validate macOS signing secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+
+          [ -z "${CSC_LINK:-}" ] && missing+=("MACOS_CERT_P12_BASE64")
+          [ -z "${CSC_KEY_PASSWORD:-}" ] && missing+=("MACOS_CERT_PASSWORD")
+          [ -z "${APPLE_ID:-}" ] && missing+=("APPLE_ID")
+          [ -z "${APPLE_APP_SPECIFIC_PASSWORD:-}" ] && missing+=("APPLE_APP_SPECIFIC_PASSWORD")
+          [ -z "${APPLE_TEAM_ID:-}" ] && missing+=("APPLE_TEAM_ID")
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "Missing required GitHub secrets for signed/notarized macOS build: ${missing[*]}"
+            exit 1
+          fi
 
       - name: Build macOS DMG
         env:
